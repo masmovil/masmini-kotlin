@@ -4,14 +4,14 @@ import android.os.Bundle
 import com.minikorp.grove.ConsoleLogTree
 import com.minikorp.grove.Grove
 import kotlinx.android.synthetic.main.home_activity.*
-import mini.LoggerInterceptor
-import mini.MiniGen
-import mini.rx.android.activities.FluxRxActivity
-import mini.rx.flowable
+import masmini.LoggerInterceptor
+import masmini.MasMiniGen
+import masmini.rx.android.activities.FluxRxActivity
+import masmini.rx.flowable
 
 class SampleRxActivity : FluxRxActivity() {
 
-    private val dispatcher = MiniGen.newDispatcher()
+    private val dispatcher = MasMiniGen.newDispatcher()
     private val dummyStore = DummyStore()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +19,7 @@ class SampleRxActivity : FluxRxActivity() {
         setContentView(R.layout.home_activity)
 
         val stores = listOf(dummyStore)
-        MiniGen.subscribe(dispatcher, stores)
+        MasMiniGen.subscribe(dispatcher, stores)
         stores.forEach { it.initialize() }
 
         dummyStore.flowable()

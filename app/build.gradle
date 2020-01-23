@@ -67,11 +67,11 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation project(":mini-android")
-    implementation project(':mini-rx2')
-    implementation project(':mini-rx2-android')
+    implementation project(':masmini-android')
+    implementation project(':masmini-rx2')
+    implementation project(':masmini-rx2-android')
 
-    kapt project(":mini-processor")
+    kapt project(':masmini-processor')
 
     //Misc
     implementation 'com.github.minikorp:grove:1.0.3'

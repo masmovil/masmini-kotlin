@@ -46,7 +46,7 @@ allprojects {
     }
 
     version = mini_version
-    group = "com.masmovil.mini"
+    group = "com.masmovil.masmini"
 
     repositories {
         jcenter()
