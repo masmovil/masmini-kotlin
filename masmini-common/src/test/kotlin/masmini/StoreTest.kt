@@ -2,6 +2,7 @@ package masmini
 
 import org.amshove.kluent.`should be equal to`
 import org.junit.Test
+import java.io.Closeable
 
 class StoreTest {
 
@@ -43,5 +44,15 @@ class StoreTest {
         closeable.close()
         store.updateState("abc")
         state `should be equal to` ""
+    }
+
+    @Test
+    fun `close listener doesn't throw concurrent exception`() {
+        val store = SampleStore()
+        store.subscribe(hotStart = false) {}
+
+        var subscription: Closeable? = null
+        subscription = store.subscribe(hotStart = false) { subscription?.close() }
+        store.updateState("abc")
     }
 }
