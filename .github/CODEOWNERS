@@ -1,0 +1,10 @@
+# This is a comment.
+# Each line is a file pattern followed by one or more owners.
+
+# Current code owners
+# - @nicolasmertanen -> Nicolás Mertanen
+# - @davidbaena -> David Baena
+# - @finxo -> Alejandro Lopez
+# - @danielceinos -> Daniel Sánchez
+
+*   @nicolasmertanen @finxo @danielceinos
