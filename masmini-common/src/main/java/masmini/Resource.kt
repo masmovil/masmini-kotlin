@@ -142,6 +142,11 @@ fun <T> Iterable<Resource<T>>.anyLoading(): Boolean {
 /** Any resource empty */
 fun <T> Iterable<Resource<T>>.anyEmpty(): Boolean = this.any { it.isEmpty }
 
+/** All resources completed, whether they're in success or failure state. */
+fun <T> Iterable<Resource<T>>.allTerminal(): Boolean {
+    return this.all { it.isTerminal }
+}
+
 fun <T> Iterable<Resource<T>>.onAllSuccessful(fn: () -> Unit): Iterable<Resource<T>> {
     if (this.allSuccesful()) fn()
     return this
@@ -149,6 +154,11 @@ fun <T> Iterable<Resource<T>>.onAllSuccessful(fn: () -> Unit): Iterable<Resource
 
 fun <T> Iterable<Resource<T>>.onAnyFailure(fn: () -> Unit): Iterable<Resource<T>> {
     if (this.anyFailure()) fn()
+    return this
+}
+
+fun <T> Iterable<Resource<T>>.onAllTerminal(fn: () -> Unit): Iterable<Resource<T>> {
+    if (this.allTerminal()) fn()
     return this
 }
 
@@ -163,3 +173,7 @@ fun <T> Iterable<Resource<T>>.onAnyEmpty(fn: () -> Unit): Iterable<Resource<T>> 
 }
 
 fun Iterable<Task>.onAnyIdle(fn: () -> Unit): Iterable<Task> = onAnyEmpty(fn).map { it as Task }
+
+/** Returns the first exception that can be found in a list of resources, null if it can't find any */
+fun <T> Iterable<Resource<T>>.firstExceptionOrNull() : Throwable? =
+        this.firstOrNull { it.isFailure && it.exceptionOrNull() != null }?.exceptionOrNull()
