@@ -5,21 +5,23 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
-import org.kodein.di.DKodein
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.bindings.NoArgBindingKodein
-import org.kodein.di.direct
-import org.kodein.di.generic.bind
-import org.kodein.di.generic.instance
-import org.kodein.di.generic.instanceOrNull
-import org.kodein.di.generic.provider
+import masmini.Store
+import org.kodein.di.*
+import org.kodein.di.bindings.NoArgBindingDI
+
+
+/**
+ * Binds a store in a Kodein module, assuming that it's a singleton dependency.
+ */
+inline fun <reified T : Store<*>> DI.Builder.bindStore(noinline creator: NoArgBindingDI<*>.() -> T) {
+    bind<T>() with singleton(creator = creator)
+    bind<Store<*>>().inSet() with singleton { instance<T>() }
+}
 
 /**
  * Binds a ViewModel to a Kotlin module, assuming that it's a provided dependency.
  */
-inline fun <reified T : ViewModel> Kodein.Builder.bindViewModel(overrides: Boolean? = null, noinline creator: NoArgBindingKodein<*>.() -> T) {
+inline fun <reified T : ViewModel> DI.Builder.bindViewModel(overrides: Boolean? = null, noinline creator: NoArgBindingDI<*>.() -> T) {
     bind<T>(T::class.java.simpleName, overrides) with provider(creator)
 }
 
@@ -32,7 +34,7 @@ inline fun <reified T : ViewModel> Kodein.Builder.bindViewModel(overrides: Boole
  * The default is true to mimic the default behaviour of [ViewModelProviders.of].
  */
 class KodeinViewModelFactory(
-        private val injector: DKodein,
+        private val injector: DirectDI,
         private val allowNewInstance: Boolean = true
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
@@ -50,7 +52,7 @@ class KodeinViewModelFactory(
  * Injects a [ViewModel] into a [FragmentActivity] that implements [KodeinAware].
  */
 @MainThread
-inline fun <reified VM : ViewModel, A> A.viewModel(): Lazy<VM> where A : KodeinAware, A : FragmentActivity {
+inline fun <reified VM : ViewModel, A> A.viewModel(): Lazy<VM> where A : DIAware, A : FragmentActivity {
     return lazy {
         ViewModelProvider(this, direct.instance()).get(VM::class.java)
     }
@@ -60,7 +62,7 @@ inline fun <reified VM : ViewModel, A> A.viewModel(): Lazy<VM> where A : KodeinA
  * Injects a [ViewModel] into a [Fragment] that implements [KodeinAware].
  */
 @MainThread
-inline fun <reified VM : ViewModel, F> F.viewModel(): Lazy<VM> where F : KodeinAware, F : Fragment {
+inline fun <reified VM : ViewModel, F> F.viewModel(): Lazy<VM> where F : DIAware, F : Fragment {
     return lazy {
         ViewModelProvider(this, direct.instance()).get(VM::class.java)
     }
@@ -71,7 +73,7 @@ inline fun <reified VM : ViewModel, F> F.viewModel(): Lazy<VM> where F : KodeinA
  * different fragments hosted by that same [Activity].
  */
 @MainThread
-inline fun <reified VM : ViewModel, F> F.sharedActivityViewModel(): Lazy<VM> where F : KodeinAware, F : Fragment {
+inline fun <reified VM : ViewModel, F> F.sharedActivityViewModel(): Lazy<VM> where F : DIAware, F : Fragment {
     return lazy {
         ViewModelProvider(this.requireActivity(), direct.instance()).get(VM::class.java)
     }
