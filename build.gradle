@@ -11,7 +11,7 @@ buildscript {
 
         lifecycle_version = "2.3.0"
         rx_version = "2.2.21"
-        coroutines_version = "1.4.3"
+        coroutines_version = "1.4.3-native-mt"
         junit_version = "4.13.2"
         kluent_version = "1.65"
 
