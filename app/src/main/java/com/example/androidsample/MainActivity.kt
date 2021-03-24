@@ -7,13 +7,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.SavedStateHandle
+import kotlinx.coroutines.*
 import masmini.*
 import masmini.android.FluxActivity
-import masmini.android.FluxViewModel
-import kotlinx.coroutines.delay
+import masmini.android.FluxStoreViewModel
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
-import java.io.Closeable
 import java.io.Serializable
 
 val dispatcher = Dispatcher()
@@ -40,14 +38,6 @@ class LongUseCaseAction(val userName: String) : AnalyticsAction, SuspendingActio
  * Use any name you like for suspending actions, or use reducer
  */
 typealias UseCase = Reducer
-
-// Defaults: Dispatchers.Default, "coroutine"
-
-val scope = CoroutineScope(
-        Job() + Dispatchers.Main + coroutineExceptionHandler
-)
-
-val job = scope.launch(Dispatchers.IO)
 
 class MainStore : Store<State>() {
 
@@ -100,7 +90,7 @@ class MainViewModelReducer : NestedStateContainer<State>() {
     }
 }
 
-class MainViewModel(savedStateHandle: SavedStateHandle) : FluxViewModel<State>(savedStateHandle) {
+class MainStoreViewModel(savedStateHandle: SavedStateHandle) : FluxStoreViewModel<State>(savedStateHandle) {
     private val reducerSlice = MainViewModelReducer().apply { parent = this }
 
     init {
@@ -132,18 +122,18 @@ class MainActivity : FluxActivity() {
 
     lateinit var textView: TextView
     lateinit var progressBar: ProgressBar
-    private val vm: MainViewModel by viewModels()
+    private val vm: MainStoreViewModel by viewModels()
 
     override suspend fun whenCreated(savedInstanceState: Bundle?) {
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.main_activity)
         textView = findViewById(R.id.textView)
         progressBar = findViewById(R.id.progressBar)
 
         textView.setOnClickListener {
             launch {
                 dispatcher.dispatch(LongUseCaseAction("Pablo"))
-                //Decide on the state after usecase is done
-                //I won't run until use case is done
+                // Decide on the state after usecase is done
+                // I won't run until use case is done
             }
         }
 

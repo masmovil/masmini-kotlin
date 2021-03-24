@@ -34,6 +34,11 @@ abstract class FluxActivity : AppCompatActivity(),
         lifecycleScope.launch { whenPaused() }
     }
 
+    override fun onStop() {
+        super.onStop()
+        lifecycleScope.launch { whenStopped() }
+    }
+
     override fun onDestroy() {
         lifecycleScope.launch { whenDestroyed() }
         close()
@@ -47,6 +52,7 @@ abstract class FluxActivity : AppCompatActivity(),
     protected open suspend fun whenCreated(savedInstanceState: Bundle?) = Unit
     protected open suspend fun whenResumed() = Unit
     protected open suspend fun whenPaused() = Unit
+    protected open suspend fun whenStopped() = Unit
     protected open suspend fun whenDestroyed() = Unit
 
 }
