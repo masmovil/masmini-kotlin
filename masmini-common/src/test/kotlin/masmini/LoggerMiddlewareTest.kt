@@ -15,10 +15,10 @@ class LoggerMiddlewareTest {
 
         val out = StringBuilder()
         dispatcher.addMiddleware(LoggerMiddleware(listOf(store),
-                logger = { priority, tag, msg ->
-                    println("[$priority][$tag] $msg")
-                    out.append(priority).append(tag).append(msg)
-                }))
+            logger = { priority, tag, msg ->
+                println("[$priority][$tag] $msg")
+                out.append(priority).append(tag).append(msg)
+            }))
         dispatcher.dispatchBlocking(TestAction())
         out.toString().`should not be empty`()
     }

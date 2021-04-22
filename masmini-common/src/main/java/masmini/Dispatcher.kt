@@ -1,15 +1,14 @@
 package masmini
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.Closeable
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.KClass
 
 private typealias DispatchCallback = suspend (Any) -> Unit
-
 
 /**
  * Hub for actions. Use code generation with [Mini]
@@ -35,7 +34,7 @@ class Dispatcher(private val strictMode: Boolean = false) {
     private val subscriptionCaller: Chain = object : Chain {
         override suspend fun proceed(action: Any): Any {
             val types = actionTypeMap[action::class]
-                    ?: error("${action::class.simpleName} is not action")
+                        ?: error("${action::class.simpleName} is not action")
             //Ensure reducer is called on Main dispatcher
             types.forEach { type ->
                 subscriptions[type]?.forEach { it.fn(action) }
@@ -103,7 +102,6 @@ class Dispatcher(private val strictMode: Boolean = false) {
             subscriptions[registration.type]?.remove(registration)
         }
     }
-
 
     /**
      * Dispatch an action on the main thread using an unconfined dispatcher

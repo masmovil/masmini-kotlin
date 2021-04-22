@@ -1,7 +1,6 @@
 package masmini
 
 import java.io.Closeable
-import java.lang.IllegalStateException
 import kotlin.reflect.KClass
 
 const val DISPATCHER_FACTORY_CLASS_NAME = "masmini.codegen.Mini_Generated"
@@ -15,7 +14,7 @@ abstract class Mini {
                 Class.forName(DISPATCHER_FACTORY_CLASS_NAME).getField("INSTANCE").get(null) as Mini
             } catch (ex: Throwable) {
                 throw ClassNotFoundException("Failed to load generated class $DISPATCHER_FACTORY_CLASS_NAME, " +
-                        "most likely kapt did not run, add it as dependency to the project", ex)
+                                             "most likely kapt did not run, add it as dependency to the project", ex)
             }
         }
 

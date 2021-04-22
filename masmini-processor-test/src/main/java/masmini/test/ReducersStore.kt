@@ -1,9 +1,8 @@
 package masmini.test
 
+import kotlinx.coroutines.yield
 import masmini.Reducer
 import masmini.Store
-import kotlinx.coroutines.yield
-
 
 class ReducersStore : Store<BasicState>() {
 

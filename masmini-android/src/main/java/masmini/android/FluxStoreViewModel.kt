@@ -10,11 +10,10 @@ import java.io.Closeable
 import java.util.concurrent.CopyOnWriteArrayList
 
 abstract class FluxStoreViewModel<S : Any>(
-        val savedStateHandle: SavedStateHandle) :
-        ViewModel(),
-        StateContainer<S>,
-        CloseableTracker by DefaultCloseableTracker() {
-
+    val savedStateHandle: SavedStateHandle) :
+    ViewModel(),
+    StateContainer<S>,
+    CloseableTracker by DefaultCloseableTracker() {
 
     class ViewModelSubscription internal constructor(private val vm: FluxStoreViewModel<*>,
                                                      private val fn: Any) : Closeable {
@@ -38,7 +37,6 @@ abstract class FluxStoreViewModel<S : Any>(
             @Suppress("UNCHECKED_CAST")
             return _state as S
         }
-
 
     override fun setState(newState: S) {
         assertOnUiThread()

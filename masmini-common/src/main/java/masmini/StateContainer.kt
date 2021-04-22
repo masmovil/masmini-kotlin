@@ -35,7 +35,7 @@ interface StateContainer<S> {
     @Suppress("UNCHECKED_CAST")
     fun initialState(): S {
         val type = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0]
-                as Class<S>
+            as Class<S>
         try {
             val constructor = type.getDeclaredConstructor()
             constructor.isAccessible = true
@@ -58,6 +58,21 @@ interface StateContainer<S> {
             }
         } else {
             setState(s)
+        }
+    }
+
+    /**
+     * Test only method, don't use in app code.
+     * Will force state change on UI to the initial state.
+     */
+    @TestOnly
+    fun resetState() {
+        if (isAndroid) {
+            onUiSync {
+                setState(initialState())
+            }
+        } else {
+            setState(initialState())
         }
     }
 }

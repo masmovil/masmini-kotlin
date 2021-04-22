@@ -1,7 +1,8 @@
-package masmini
+package masmini.processor
 
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import masmini.Mini
 import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.TypeMirror
@@ -11,31 +12,31 @@ object ActionTypesGenerator {
     fun generate(container: TypeSpec.Builder, elements: Set<Element>) {
 
         val actionModels = elements.filter { Modifier.ABSTRACT !in it.modifiers }
-                .map { ActionModel(it) }
+            .map { ActionModel(it) }
 
         container.apply {
             val anyClassTypeName = KClass::class.asTypeName().parameterizedBy(STAR)
             val listTypeName = List::class.asTypeName().parameterizedBy(anyClassTypeName)
             val mapType = Map::class
-                    .asClassName()
-                    .parameterizedBy(anyClassTypeName, listTypeName)
+                .asClassName()
+                .parameterizedBy(anyClassTypeName, listTypeName)
 
             val prop = PropertySpec.builder(Mini::actionTypes.name, mapType)
-                    .addModifiers(KModifier.OVERRIDE)
-                    .initializer(CodeBlock.builder()
-                            .add("mapOf(\n⇥")
-                            .apply {
-                                actionModels.forEach { actionModel ->
-                                    val comma = if (actionModel != actionModels.last()) "," else ""
-                                    add("«")
-                                    add("%T::class to ", actionModel.typeName)
-                                    add(actionModel.listOfSupertypesCodeBlock())
-                                    add(comma)
-                                    add("\n»")
-                                }
-                            }
-                            .add("⇤)")
-                            .build())
+                .addModifiers(KModifier.OVERRIDE)
+                .initializer(CodeBlock.builder()
+                    .add("mapOf(\n⇥")
+                    .apply {
+                        actionModels.forEach { actionModel ->
+                            val comma = if (actionModel != actionModels.last()) "," else ""
+                            add("«")
+                            add("%T::class to ", actionModel.typeName)
+                            add(actionModel.listOfSupertypesCodeBlock())
+                            add(comma)
+                            add("\n»")
+                        }
+                    }
+                    .add("⇤)")
+                    .build())
             addProperty(prop.build())
         }.build()
     }
@@ -47,10 +48,10 @@ class ActionModel(element: Element) {
 
     val typeName = type.asTypeName()
     private val superTypes = collectTypes(type)
-            .sortedBy { it.depth }
-            .filter { it.typeName != javaObject }
-            .map { it.typeName }
-            .plus(ANY)
+        .sortedBy { it.depth }
+        .filter { it.typeName != javaObject }
+        .map { it.typeName }
+        .plus(ANY)
 
     fun listOfSupertypesCodeBlock(): CodeBlock {
         val format = superTypes.joinToString(",\n") { "%T::class" }
@@ -61,8 +62,8 @@ class ActionModel(element: Element) {
     private fun collectTypes(mirror: TypeMirror, depth: Int = 0): Set<ActionSuperType> {
         //We want to add by depth
         val superTypes = typeUtils.directSupertypes(mirror).toSet()
-                .map { collectTypes(it, depth + 1) }
-                .flatten()
+            .map { collectTypes(it, depth + 1) }
+            .flatten()
         return setOf(ActionSuperType(mirror.asTypeName(), depth)) + superTypes
     }
 

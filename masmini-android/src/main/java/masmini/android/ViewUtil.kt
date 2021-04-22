@@ -14,22 +14,22 @@ import kotlin.math.roundToInt
  * Has no effect when resource is idle.
  */
 fun toggleViewsVisibility(
-        resource: Resource<*>,
-        contentView: View? = null,
-        loadingView: View? = null,
-        errorView: View? = null,
-        idleView: View? = null,
-        invisibilityType: Int = View.INVISIBLE
+    resource: Resource<*>,
+    contentView: View? = null,
+    loadingView: View? = null,
+    errorView: View? = null,
+    idleView: View? = null,
+    invisibilityType: Int = View.INVISIBLE
 ) {
     val newVisibilities = arrayOf(invisibilityType, invisibilityType, invisibilityType, invisibilityType)
     val indexToMakeVisible =
-            when {
-                resource.isSuccess -> 0
-                resource.isLoading -> 1
-                resource.isFailure -> 2
-                resource.isEmpty -> 3
-                else -> throw UnsupportedOperationException()
-            }
+        when {
+            resource.isSuccess -> 0
+            resource.isLoading -> 1
+            resource.isFailure -> 2
+            resource.isEmpty -> 3
+            else -> throw UnsupportedOperationException()
+        }
     newVisibilities[indexToMakeVisible] = View.VISIBLE
     contentView?.visibility = newVisibilities[0]
     loadingView?.visibility = newVisibilities[1]

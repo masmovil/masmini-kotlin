@@ -32,16 +32,16 @@ open class Resource<out T> @PublishedApi internal constructor(val value: Any?) {
      * Get the current value if successful, or null for other cases.
      */
     fun getOrNull(): T? =
-            when {
-                isSuccess -> value as T?
-                else -> null
-            }
+        when {
+            isSuccess -> value as T?
+            else -> null
+        }
 
     fun exceptionOrNull(): Throwable? =
-            when (value) {
-                is Failure -> value.exception
-                else -> null
-            }
+        when (value) {
+            is Failure -> value.exception
+            else -> null
+        }
 
     companion object {
         fun <T> success(value: T): Resource<T> = Resource(value)
@@ -62,7 +62,6 @@ open class Resource<out T> @PublishedApi internal constructor(val value: Any?) {
  * An alias for a empty resource.
  */
 typealias Task = Resource<Nothing?>
-
 
 inline fun <T> Resource<T>.onSuccess(crossinline action: (data: T) -> Unit): Resource<T> {
     if (isSuccess) action(value as T)

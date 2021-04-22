@@ -3,21 +3,20 @@ package masmini.android
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import masmini.CloseableTracker
-import masmini.DefaultCloseableTracker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
+import masmini.CloseableTracker
+import masmini.DefaultCloseableTracker
 import kotlin.coroutines.CoroutineContext
 
 abstract class FluxActivity : AppCompatActivity(),
-        CloseableTracker by DefaultCloseableTracker(),
-        CoroutineScope {
+    CloseableTracker by DefaultCloseableTracker(),
+    CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = lifecycleScope.coroutineContext
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

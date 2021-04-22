@@ -1,7 +1,11 @@
-package masmini
+package masmini.processor
 
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import masmini.CompositeCloseable
+import masmini.Dispatcher
+import masmini.Reducer
+import masmini.StateContainer
 import java.io.Closeable
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
@@ -13,41 +17,41 @@ object ReducersGenerator {
 
     fun generate(container: TypeSpec.Builder, elements: Set<Element>) {
         val reducers = elements.map { ReducerModel(it) }
-                .groupBy { it.container.typeName }
+            .groupBy { it.container.typeName }
 
         val whenBlock = CodeBlock.builder()
-                .addStatement("val c = %T()", CompositeCloseable::class)
-                .addStatement("when (container) {").indent()
-                .apply {
-                    reducers.forEach { (containerName, reducerFunctions) ->
-                        addStatement("is %T -> {", containerName).indent()
-                        reducerFunctions.forEach { function ->
-                            add("c.add(dispatcher.subscribe<%T>(priority=%L) { action -> ",
-                                    function.actionTypeName,
-                                    function.priority
-                            )
-                            add(function.generateCallBlock("container", "action"))
-                            addStatement("})")
-                        }
-                        unindent().addStatement("}")
+            .addStatement("val c = %T()", CompositeCloseable::class)
+            .addStatement("when (container) {").indent()
+            .apply {
+                reducers.forEach { (containerName, reducerFunctions) ->
+                    addStatement("is %T -> {", containerName).indent()
+                    reducerFunctions.forEach { function ->
+                        add("c.add(dispatcher.subscribe<%T>(priority=%L) { action -> ",
+                            function.actionTypeName,
+                            function.priority
+                        )
+                        add(function.generateCallBlock("container", "action"))
+                        addStatement("})")
                     }
+                    unindent().addStatement("}")
                 }
-                .unindent()
-                .addStatement("}") //Close when
-                .addStatement("return c")
-                .build()
+            }
+            .unindent()
+            .addStatement("}") //Close when
+            .addStatement("return c")
+            .build()
 
         val typeParam = TypeVariableName("T")
         val oneParam = StateContainer::class.asTypeName().parameterizedBy(typeParam)
 
         val registerOneFn = FunSpec.builder("subscribe")
-                .addModifiers(KModifier.OVERRIDE)
-                .addTypeVariable(typeParam)
-                .addParameter("dispatcher", Dispatcher::class)
-                .addParameter("container", oneParam)
-                .returns(Closeable::class)
-                .addCode(whenBlock)
-                .build()
+            .addModifiers(KModifier.OVERRIDE)
+            .addTypeVariable(typeParam)
+            .addParameter("dispatcher", Dispatcher::class)
+            .addParameter("container", oneParam)
+            .returns(Closeable::class)
+            .addCode(whenBlock)
+            .build()
 
         container.addFunction(registerOneFn)
     }
@@ -67,9 +71,9 @@ class ReducerModel(element: Element) {
 
     init {
         compilePrecondition(
-                check = function.modifiers.contains(Modifier.PUBLIC),
-                message = "Reducer functions must be public.",
-                element = element
+            check = function.modifiers.contains(Modifier.PUBLIC),
+            message = "Reducer functions must be public.",
+            element = element
         )
 
         isSuspending = function.isSuspending()
@@ -79,7 +83,7 @@ class ReducerModel(element: Element) {
         if (isSuspending) {
             //Hacky check to get return type of a kotlin continuation
             val continuationTypeParameter = (function.parameters.last().asType() as DeclaredType)
-                    .typeArguments[0].asTypeName() as WildcardTypeName
+                .typeArguments[0].asTypeName() as WildcardTypeName
             returnTypeName = continuationTypeParameter.inTypes.first()
             parameters = function.parameters.dropLast(1).map { it.asType().asTypeName() }
         } else {
@@ -91,30 +95,30 @@ class ReducerModel(element: Element) {
             isPure = false
             actionTypeName = function.parameters[0].asType().asTypeName().safeAnyTypeName()
             compilePrecondition(
-                    check = parameters.size == 1,
-                    message = "Expected exactly one action parameter",
-                    element = element
+                check = parameters.size == 1,
+                message = "Expected exactly one action parameter",
+                element = element
             )
         } else {
             isPure = true
             compilePrecondition(
-                    check = parameters.size == 2,
-                    message = "Expected exactly two parameters, ${container.stateTypeName} and action",
-                    element = element
+                check = parameters.size == 2,
+                message = "Expected exactly two parameters, ${container.stateTypeName} and action",
+                element = element
             )
             val stateTypeName = parameters[0]
             actionTypeName = parameters[1].safeAnyTypeName()
 
             compilePrecondition(
-                    check = stateTypeName == container.stateTypeName,
-                    message = "Expected ${container.stateTypeName} as first state parameter",
-                    element = element
+                check = stateTypeName == container.stateTypeName,
+                message = "Expected ${container.stateTypeName} as first state parameter",
+                element = element
             )
 
             compilePrecondition(
-                    check = returnTypeName == container.stateTypeName,
-                    message = "Expected ${container.stateTypeName} as return value",
-                    element = element
+                check = returnTypeName == container.stateTypeName,
+                message = "Expected ${container.stateTypeName} as return value",
+                element = element
             )
         }
 
@@ -136,16 +140,16 @@ class ReducerModel(element: Element) {
 
         return if (isPure) {
             CodeBlock.builder()
-                    .add("${containerParam}.setState(")
-                    .add(receiver)
-                    .add(call)
-                    .add(")")
-                    .build()
+                .add("${containerParam}.setState(")
+                .add(receiver)
+                .add(call)
+                .add(")")
+                .build()
         } else {
             CodeBlock.builder()
-                    .add(receiver)
-                    .add(call)
-                    .build()
+                .add(receiver)
+                .add(call)
+                .build()
         }
     }
 }
@@ -157,9 +161,9 @@ class ContainerModel(element: Element) {
 
     init {
         compilePrecondition(
-                check = element.kind == ElementKind.CLASS,
-                message = "Reducers must be declared inside StoreContainer classes",
-                element = element
+            check = element.kind == ElementKind.CLASS,
+            message = "Reducers must be declared inside StoreContainer classes",
+            element = element
         )
 
         val mainTypeName = element.asType().asTypeName()
@@ -177,11 +181,11 @@ class ContainerModel(element: Element) {
 
         val superTypes = realContainer.asType().getAllSuperTypes().map { it.asTypeName() }
         val stateContainerType = superTypes
-                .find { it is ParameterizedTypeName && it.rawType == StateContainer::class.asTypeName() }
+            .find { it is ParameterizedTypeName && it.rawType == StateContainer::class.asTypeName() }
         compilePrecondition(
-                check = stateContainerType != null,
-                message = "Reducers must be declared in a StateContainer<T>",
-                element = element
+            check = stateContainerType != null,
+            message = "Reducers must be declared in a StateContainer<T>",
+            element = element
         )
 
         stateTypeName = (stateContainerType!! as ParameterizedTypeName).typeArguments[0]

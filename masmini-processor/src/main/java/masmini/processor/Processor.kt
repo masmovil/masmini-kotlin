@@ -1,8 +1,12 @@
-package masmini
+package masmini.processor
 
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
+import masmini.Action
+import masmini.DISPATCHER_FACTORY_CLASS_NAME
+import masmini.Mini
+import masmini.Reducer
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
@@ -10,8 +14,8 @@ import javax.lang.model.SourceVersion
 class Processor {
 
     val supportedAnnotationTypes: MutableSet<String> = mutableSetOf(
-            Reducer::class.java, Action::class.java)
-            .map { it.canonicalName }.toMutableSet()
+        Reducer::class.java, Action::class.java)
+        .map { it.canonicalName }.toMutableSet()
     val supportedSourceVersion: SourceVersion = SourceVersion.RELEASE_8
 
     fun init(environment: ProcessingEnvironment) {
@@ -30,8 +34,8 @@ class Processor {
         val className = ClassName.bestGuess(DISPATCHER_FACTORY_CLASS_NAME)
         val file = FileSpec.builder(className.packageName, className.simpleName)
         val container = TypeSpec.objectBuilder(className)
-                .addKdoc("Automatically generated, do not edit.\n")
-                .superclass(Mini::class)
+            .addKdoc("Automatically generated, do not edit.\n")
+            .superclass(Mini::class)
 
         //Get non-abstract actions
         try {
@@ -40,8 +44,8 @@ class Processor {
         } catch (e: Throwable) {
             if (e !is ProcessorException) {
                 logError(
-                        "Compiler crashed, open an issue please!\n" +
-                                " ${e.stackTraceString()}"
+                    "Compiler crashed, open an issue please!\n" +
+                    " ${e.stackTraceString()}"
                 )
             }
         }

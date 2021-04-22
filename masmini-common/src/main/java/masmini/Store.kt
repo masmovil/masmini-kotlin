@@ -7,8 +7,8 @@ import java.util.concurrent.CopyOnWriteArrayList
  * Basic state holder.
  */
 abstract class Store<S> : Closeable,
-        StateContainer<S>,
-        CloseableTracker by DefaultCloseableTracker() {
+    StateContainer<S>,
+    CloseableTracker by DefaultCloseableTracker() {
 
     class StoreSubscription internal constructor(private val store: Store<*>,
                                                  private val fn: Any) : Closeable {

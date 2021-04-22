@@ -3,17 +3,17 @@ package masmini.android
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import masmini.CloseableTracker
-import masmini.DefaultCloseableTracker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
+import masmini.CloseableTracker
+import masmini.DefaultCloseableTracker
 import kotlin.coroutines.CoroutineContext
 
 abstract class FluxFragment : Fragment(),
-        CloseableTracker by DefaultCloseableTracker(),
-        CoroutineScope {
+    CloseableTracker by DefaultCloseableTracker(),
+    CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = lifecycleScope.coroutineContext

@@ -1,7 +1,9 @@
 package masmini
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.take
 import org.amshove.kluent.`should be equal to`
 import org.amshove.kluent.`should equal`
 import org.junit.Test
@@ -10,7 +12,7 @@ import java.util.concurrent.Executors
 class StoreFlowTest {
 
     private val testScope =
-            CoroutineScope(Executors.newScheduledThreadPool(1).asCoroutineDispatcher())
+        CoroutineScope(Executors.newScheduledThreadPool(1).asCoroutineDispatcher())
 
     @Test(timeout = 1000)
     fun `flow sends initial state on collection`(): Unit = runBlocking {
@@ -18,9 +20,9 @@ class StoreFlowTest {
         var observedState = SampleStore.INITIAL_STATE
 
         val job = store.flow(hotStart = false)
-                .onEach { observedState = it }
-                .take(1)
-                .launchIn(testScope)
+            .onEach { observedState = it }
+            .take(1)
+            .launchIn(testScope)
 
         store.setState("abc") //Set before collect
 
@@ -35,14 +37,14 @@ class StoreFlowTest {
         val called = intArrayOf(0, 0)
 
         val job1 = store.flow()
-                .onEach { called[0]++ }
-                .take(2)
-                .launchIn(testScope)
+            .onEach { called[0]++ }
+            .take(2)
+            .launchIn(testScope)
 
         val job2 = store.flow()
-                .onEach { called[1]++ }
-                .take(2)
-                .launchIn(testScope)
+            .onEach { called[1]++ }
+            .take(2)
+            .launchIn(testScope)
 
         store.setState("abc")
 
@@ -75,10 +77,10 @@ class StoreFlowTest {
 
         val scope = CoroutineScope(Job())
         store.flow()
-                .onEach {
-                    observedState = it
-                }
-                .launchIn(scope)
+            .onEach {
+                observedState = it
+            }
+            .launchIn(scope)
 
         scope.cancel() //Cancel the scope
         store.setState("abc")

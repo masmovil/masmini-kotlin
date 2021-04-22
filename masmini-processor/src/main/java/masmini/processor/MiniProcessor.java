@@ -12,8 +12,6 @@ import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 
-import masmini.Processor;
-
 /**
  * Dummy Java wrapper that delegates to Kotlin one
  */
@@ -21,26 +19,26 @@ import masmini.Processor;
 @SupportedOptions("kapt.kotlin.generated")
 public class MiniProcessor extends AbstractProcessor {
 
-    private final Processor processor = new Processor();
+   private final Processor processor = new Processor();
 
-    @Override
-    public synchronized void init(ProcessingEnvironment processingEnvironment) {
-        super.init(processingEnvironment);
-        processor.init(processingEnvironment);
-    }
+   @Override
+   public synchronized void init(ProcessingEnvironment processingEnvironment) {
+      super.init(processingEnvironment);
+      processor.init(processingEnvironment);
+   }
 
-    @Override
-    public Set<String> getSupportedAnnotationTypes() {
-        return processor.getSupportedAnnotationTypes();
-    }
+   @Override
+   public Set<String> getSupportedAnnotationTypes() {
+      return processor.getSupportedAnnotationTypes();
+   }
 
-    @Override
-    public SourceVersion getSupportedSourceVersion() {
-        return processor.getSupportedSourceVersion();
-    }
+   @Override
+   public SourceVersion getSupportedSourceVersion() {
+      return processor.getSupportedSourceVersion();
+   }
 
-    @Override
-    public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-        return processor.process(roundEnvironment);
-    }
+   @Override
+   public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
+      return processor.process(roundEnvironment);
+   }
 }

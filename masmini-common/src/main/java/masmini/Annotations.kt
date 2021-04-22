@@ -13,7 +13,6 @@ const val DEFAULT_PRIORITY = 100
 @Inherited
 annotation class Action
 
-
 /**
  * Mark a function declared in a [StateContainer] as a reducer function.
  *

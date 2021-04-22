@@ -1,6 +1,5 @@
 package masmini
 
-
 class SampleStore : Store<String>() {
 
     companion object {

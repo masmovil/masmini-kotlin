@@ -13,7 +13,7 @@ android {
     buildToolsVersion android_build_tools_version
 
     defaultConfig {
-        applicationId "com.example.androidsample"
+        applicationId "com.masmovil.minisample"
         minSdkVersion 21
         targetSdkVersion android_target_sdk
         versionCode android_version_code

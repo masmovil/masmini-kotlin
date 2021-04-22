@@ -3,7 +3,6 @@ package masmini
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 
-
 /**
  * Map multiple objects into a list to run an effect on any change.
  */
@@ -18,7 +17,7 @@ fun <T, R> Flow<T>.selectMany(vararg mappers: suspend (T) -> R): Flow<List<R>> {
  */
 fun <T, R> Flow<T>.select(mapper: suspend (T) -> R): Flow<R> {
     return this.map { mapper(it) }
-            .distinctUntilChanged()
+        .distinctUntilChanged()
 }
 
 /**
@@ -26,8 +25,8 @@ fun <T, R> Flow<T>.select(mapper: suspend (T) -> R): Flow<R> {
  */
 fun <T, R : Any> Flow<T>.selectNotNull(mapper: suspend (T) -> R?): Flow<R> {
     return this.map { mapper(it) }
-            .filterNotNull()
-            .distinctUntilChanged()
+        .filterNotNull()
+        .distinctUntilChanged()
 }
 
 /**
@@ -62,7 +61,6 @@ fun Flow<Boolean>.onEachDisable(fn: (Boolean) -> Unit): Flow<Boolean> {
 fun Flow<Boolean>.onEachEnable(fn: (Boolean) -> Unit): Flow<Boolean> {
     return onEachChange(from = false, to = true, fn)
 }
-
 
 /**
  * Return the channel that will emit state changes.

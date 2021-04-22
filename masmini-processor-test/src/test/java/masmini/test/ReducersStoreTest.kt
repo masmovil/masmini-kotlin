@@ -1,11 +1,10 @@
 package masmini.test
 
+import kotlinx.coroutines.runBlocking
 import masmini.Dispatcher
 import masmini.Mini
-import kotlinx.coroutines.runBlocking
 import org.amshove.kluent.`should equal`
 import org.junit.Test
-
 
 internal class ReducersStoreTest {
 
