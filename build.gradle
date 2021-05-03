@@ -3,7 +3,7 @@ apply plugin: 'com.gladed.androidgitversion'
 
 buildscript {
     ext {
-        kotlin_version = "1.4.31"
+        kotlin_version = "1.5.0"
 
         android_compile_sdk = 30
         android_target_sdk = 30
