@@ -13,6 +13,7 @@ open class Resource<out T> @PublishedApi internal constructor(val value: Any?) {
     val isEmpty: Boolean get() = value is Empty
     val isFailure: Boolean get() = value is Failure
     val isLoading: Boolean get() = value is Loading<*>
+    val isTerminal: Boolean get() = isSuccess || isFailure
 
     internal class Empty {
         override fun toString(): String = "Empty()"
@@ -43,8 +44,11 @@ open class Resource<out T> @PublishedApi internal constructor(val value: Any?) {
             else -> null
         }
 
+    @Throws(NullPointerException::class)
+    fun <T> Resource<T>.get(): T = getOrNull()!!
+
     companion object {
-        fun <T> success(value: T): Resource<T> = Resource(value)
+        fun <T> success(value: T? = null): Resource<T> = Resource(value)
         fun <T> failure(exception: Throwable? = null): Resource<T> = Resource(Failure(exception))
         fun <T> loading(value: T? = null): Resource<T> = Resource(Loading(value))
         fun <T> empty(): Resource<T> = Resource(Empty())
@@ -105,3 +109,44 @@ fun <T> Iterable<Resource<T>>.anyFailure(): Boolean {
 fun <T> Iterable<Resource<T>>.anyLoading(): Boolean {
     return this.any { it.isLoading }
 }
+
+
+/** All resources completed, whether they're in success or failure state. */
+fun <T> Iterable<Resource<T>>.allTerminal(): Boolean {
+    return this.all { it.isTerminal }
+}
+
+/** Any resource empty */
+fun <T> Iterable<Resource<T>>.anyEmpty(): Boolean = this.any { it.isEmpty }
+
+fun <T> Iterable<Resource<T>>.onAllTerminal(fn: () -> Unit): Iterable<Resource<T>> {
+    if (this.allTerminal()) fn()
+    return this
+}
+
+fun <T> Iterable<Resource<T>>.onAllSuccessful(fn: () -> Unit): Iterable<Resource<T>> {
+    if (this.allSuccessful()) fn()
+    return this
+}
+
+fun <T> Iterable<Resource<T>>.onAnyFailure(fn: () -> Unit): Iterable<Resource<T>> {
+    if (this.anyFailure()) fn()
+    return this
+}
+
+fun <T> Iterable<Resource<T>>.onAnyLoading(fn: () -> Unit): Iterable<Resource<T>> {
+    if (this.anyLoading()) fn()
+    return this
+}
+
+fun <T> Iterable<Resource<T>>.onAnyEmpty(fn: () -> Unit): Iterable<Resource<T>> {
+    if (this.anyEmpty()) fn()
+    return this
+}
+
+fun Iterable<Task>.onAnyIdle(fn: () -> Unit): Iterable<Task> = onAnyEmpty(fn).map { it as Task }
+
+/** Returns the first exception that can be found in a list of resources, null if it can't find any */
+fun <T> Iterable<Resource<T>>.firstExceptionOrNull() : Throwable? =
+    this.firstOrNull { it.isFailure && it.exceptionOrNull() != null }?.exceptionOrNull()
+

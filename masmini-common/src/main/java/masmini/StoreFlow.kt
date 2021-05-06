@@ -88,3 +88,34 @@ fun <S : Any> StateContainer<S>.channel(hotStart: Boolean = true,
 fun <S : Any> StateContainer<S>.flow(hotStart: Boolean = true, capacity: Int = Channel.BUFFERED): Flow<S> {
     return channel(hotStart = hotStart, capacity = capacity).receiveAsFlow()
 }
+
+/**
+ * Returns a flow that contains the elements of the given flow until the element that matches
+ * the [predicate].
+ *
+ * It behaves the same way as RxJava's takeUntil.
+ */
+fun <T> Flow<T>.takeUntil(predicate: suspend (T) -> Boolean): Flow<T> =
+    transformWhile { emit(it); !predicate(it) }
+
+class StateMerger<T> {
+    val containersAndMappers = ArrayList<Pair<StateContainer<*>, () -> T>>()
+
+    /** Add a new store + mapper to the flowable. */
+    inline fun <S : StateContainer<U>, U : Any> merge(stateContainer: S, crossinline mapper: (U.() -> T)) {
+        containersAndMappers.add(stateContainer to { stateContainer.state.mapper() })
+    }
+}
+
+inline fun <T> mergeStates(hotStart: Boolean = true, crossinline builder: StateMerger<T>.() -> Unit): Flow<List<T>> {
+    return StateMerger<T>().apply { builder() }.flow(hotStart)
+}
+
+/** Build the StateMerger into the final flowable. */
+@Suppress("UNCHECKED_CAST")
+fun <T> StateMerger<T>.flow(hotStart: Boolean = true) : Flow<List<T>> {
+    return containersAndMappers
+        .map { (stateContainer, fn) -> (stateContainer as StateContainer<Any>).flow(hotStart).select { fn() } }
+        .reduce { acc, flow -> merge(acc, flow) }
+        .map { containersAndMappers.map { (_, fn) -> fn() }.toList() }
+}
