@@ -66,7 +66,6 @@ abstract class Store<S> : Closeable,
 
     override fun close() {
         listeners.clear() //Remove all listeners
-        close()
     }
 
 }
