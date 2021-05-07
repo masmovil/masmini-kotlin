@@ -29,7 +29,7 @@ class LoggerMiddleware(stores: Collection<StateContainer<*>>,
     private val stores = stores.toList()
 
     override suspend fun intercept(action: Any, chain: Chain): Any {
-        if (action is SilentAction) chain.proceed(action) //Do nothing
+        if (action is SilentAction) return chain.proceed(action) //Do nothing
 
         val isSuspending = action is SuspendingAction
         val beforeStates: Array<Any?> = Array(stores.size) { }

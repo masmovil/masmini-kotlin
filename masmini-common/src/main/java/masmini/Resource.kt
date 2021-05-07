@@ -14,6 +14,7 @@ open class Resource<out T> @PublishedApi internal constructor(val value: Any?) {
     val isFailure: Boolean get() = value is Failure
     val isLoading: Boolean get() = value is Loading<*>
     val isTerminal: Boolean get() = isSuccess || isFailure
+    val isIdle: Boolean get() = isEmpty
 
     internal class Empty {
         override fun toString(): String = "Empty()"
@@ -34,6 +35,7 @@ open class Resource<out T> @PublishedApi internal constructor(val value: Any?) {
      */
     fun getOrNull(): T? =
         when {
+            isLoading -> (value as Loading<T>).value
             isSuccess -> value as T?
             else -> null
         }
@@ -45,16 +47,14 @@ open class Resource<out T> @PublishedApi internal constructor(val value: Any?) {
         }
 
     @Throws(NullPointerException::class)
-    fun <T> Resource<T>.get(): T = getOrNull()!!
+    fun get() : T = getOrNull()!!
 
     companion object {
         fun <T> success(value: T? = null): Resource<T> = Resource(value)
         fun <T> failure(exception: Throwable? = null): Resource<T> = Resource(Failure(exception))
         fun <T> loading(value: T? = null): Resource<T> = Resource(Loading(value))
         fun <T> empty(): Resource<T> = Resource(Empty())
-
-        /** Alias for loading */
-        fun <T> idle(value: T? = null): Resource<T> = Resource(Loading(value))
+        fun <T> idle(): Resource<T> = empty()
     }
 
     override fun toString(): String {

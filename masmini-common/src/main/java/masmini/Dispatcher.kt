@@ -1,8 +1,6 @@
 package masmini
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.Closeable
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
@@ -112,6 +110,16 @@ class Dispatcher(private val strictMode: Boolean = false) {
             withContext(Dispatchers.Main.immediate) { doDispatch(action) }
         } else {
             doDispatch(action)
+        }
+    }
+
+    /**
+     * Dispatch an action on the given scope using an unconfined dispatcher
+     * so it's safe for even loops.
+     */
+    fun dispatchOn(action: Any, scope: CoroutineScope) {
+        scope.launch {
+            dispatch(action)
         }
     }
 
