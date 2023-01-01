@@ -16,6 +16,6 @@ dependencies {
     kapt "net.ltgt.gradle.incap:incap-processor:$incap_version"
 
     testImplementation "junit:junit:$junit_version"
-    def googleTesting_version = "0.19"
+    def googleTesting_version = "0.21.0"
     testImplementation "com.google.testing.compile:compile-testing:$googleTesting_version"
 }
