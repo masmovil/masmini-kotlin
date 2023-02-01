@@ -11,7 +11,7 @@ dependencies {
     implementation "com.google.auto:auto-common:$googleAuto_version"
 
     // Lib to add incremental annotation processing
-    def incap_version = "0.3"
+    def incap_version = "1.0.0"
     compileOnly "net.ltgt.gradle.incap:incap:$incap_version"
     kapt "net.ltgt.gradle.incap:incap-processor:$incap_version"
 
